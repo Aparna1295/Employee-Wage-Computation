@@ -1,85 +1,57 @@
-#!/bin/bash -x
-
+#!/usr/local/bin/bash
 echo "----------Welcome to Employee Wage Computation------------";
-
-#VARIABLE DECLARATION
-countP=0;
-countA=0;
-countF=0;
-countH=0;
-
-function checkAttendance()
-{
-	for i in {1..20}
-		do
-	   	while [[ $totalHours -lt 100 ]]
-			do
-				isPresent=$((RANDOM%2));
-				if [[ $isPresent -eq 1 ]]
-				then
-					echo "Employee is Presnt for Day $i";
-					countP=$(( countP + 1 ));
-					calDailyHours;
-				else
-					echo "Employee is Absent for Day $i";
-         		countA=$(( countA + 1 ));
-				fi
-			done
-		done
-}
-
-
 #CONSTANT DECLARATION
 IS_FULL_TIME=1;
 IS_PART_TIME=0;
 WAGE_PER_HOUR=20;
 EMPLOYEE_HOUR_FULLTIME=8;
 EMPLOYEE_HOUR_PARTTIME=4;
+NUMBER_OF_WORKING_DAYS=20;
+NUMBER_OF_WORKING_HOURS=100;
 
-#dailyWage=0;
+#DECLARING A DICTIONARY
+declare -A empWage
 
-function calDailyHours(){
+
+function getDailyHours(){
 		randomShiftCheck=$((RANDOM%2));
 		case $randomShiftCheck in
 			$IS_FULL_TIME )
 				employeeHour=$((EMPLOYEE_HOUR_FULLTIME));
-	   		echo "Employee is Full Time working for $employeeHour hours";
-				countF=$((countF + 1 ));
-				totalHours=$(($totalHours + $employeeHour));
-				calDailyWage;
 				;;
 			$IS_PART_TIME )
 				employeeHour=$((EMPLOYEE_HOUR_PARTTIME));
-   			echo "Employee is Part Time working for $employeeHour hours";
-				countH=$((countH + 1 ));
-				totalHours=$(($totalHours + $employeeHour));
-				calDailyWage;
-				;;
+   			;;
 			* )
 				employeeHour=0;
-   			echo "Employee is not working for the day";
-				;;
+   			;;
 		esac
-
-
+		echo $employeeHour;
 }
 
-function calDailyWage(){
+function getDailyWage(){
 
+	employeeHour=$1;
 	dailyWage=$(($employeeHour * $WAGE_PER_HOUR));
-	echo "Daily Wage of an Employee:$dailyWage";
-	salary=$(($salary + $dailyWage));
+	echo $dailyWage;
 
 }
 
-#FUNCTION TO CALCULATE MONTHLY SALARY
-function calMonthlyWage(){
+#GET WORKING HOURS FROM FUNCTION AND CALCULATE DAILY WAGE TILL CONDITION SATISFIED
 
-	echo "Employee is working for $countP days where $countF FullDays and $countH HalfDays";
-	echo "Monthly Salary of an Employee for $countP Days: $salary ";
+while [[ $totalEmployeeHours -lt $NUMBER_OF_WORKING_HOURS && $totalWorkingDays -lt $NUMBER_OF_WORKING_DAYS ]]
+do
+	((totalWorkingDays++));
+	empWage["$totalWorkingDays"]=$(getDailyWage $(getDailyHours));
+	totalEmployeeHours=$(($totalEmployeeHours + $(getDailyHours)));
+done
 
-}
 
-checkAttendance;
-calMonthlyWage;
+#PRINT SALARY FOR A MONTH
+salary=$(($(getDailyWage $totalEmployeeHours)));
+echo "Daily wage of the Employee:${empWage[@]}";
+echo "The Days when employee present:${!empWage[@]}";
+echo "Total Wage of the Employee for the Month:$salary";
+
+
 
