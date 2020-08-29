@@ -1,47 +1,52 @@
 #!/bin/bash -x
 
 echo "----------Welcome to Employee Wage Computation------------";
-<<<<<<< HEAD
+
+#VARIABLE DECLARATION
+countP=0;
+countA=0;
+countF=0;
+countH=0;
 
 function checkAttendance()
 {
-
-	isPresent=$((RANDOM%2));
-
-	if [[ $isPresent -eq 1 ]]
-	then
-		echo "Employee is Presnt";
-	else
-		echo "Employee is Absent";
-	fi
-
+	for i in {1..20}
+		do
+			isPresent=$((RANDOM%2));
+			if [[ $isPresent -eq 1 ]]
+			then
+				echo "Employee is Presnt for Day $i";
+				countP=$(( countP + 1 ));
+				calDailyHours;
+			else
+				echo "Employee is Absent for Day $i";
+         	countA=$(( countA + 1 ));
+			fi
+		done
 }
-
-checkAttendance;
-
->>>>>>> EmployeeDailyWageUC2
 
 
 #CONSTANT DECLARATION
-IS_FULL_TIME=2;
-IS_PART_TIME=1;
+IS_FULL_TIME=1;
+IS_PART_TIME=0;
 WAGE_PER_HOUR=20;
 EMPLOYEE_HOUR_FULLTIME=8;
 EMPLOYEE_HOUR_PARTTIME=4;
 
-
 function calDailyHours(){
-	randomShiftCheck=$((RANDOM%3));
+	randomShiftCheck=$((RANDOM%2));
 	case $randomShiftCheck in
 		$IS_FULL_TIME )
-			echo "Full Time:";
 			employeeHour=$((EMPLOYEE_HOUR_FULLTIME));
-	   	echo "Employee working for $employeeHour hours";
+	   	echo "Employee is Full Time working for $employeeHour hours";
+			countF=$((countF + 1 ));
+			calDailyWage;
 			;;
 		$IS_PART_TIME )
-         echo "Part Time:";
 			employeeHour=$((EMPLOYEE_HOUR_PARTTIME));
-   		echo "Employee working for $employeeHour hours";
+   		echo "Employee is Part Time working for $employeeHour hours";
+			countH=$((countH + 1 ));
+			calDailyWage;
 			;;
 		* )
 			employeeHour=0;
@@ -55,8 +60,17 @@ function calDailyWage()
 {
 	dailyWage=$(($employeeHour * $WAGE_PER_HOUR));
 	echo "Daily Wage of an Employee:$dailyWage";
+	salary=$(($salary+$dailyWage));
 
 }
 
-calDailyHours;
-calDailyWage;
+#FUNCTION TO CALCULATE MONTHLY SALARY
+function calMonthlyWage(){
+
+	echo "Employee is working for $countP days where $countF FullDays and $countH HalfDays";
+	echo "Monthly Salary of an Employee for $countP: "$salary;
+
+}
+
+checkAttendance;
+calMonthlyWage;
